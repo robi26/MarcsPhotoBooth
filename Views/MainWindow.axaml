@@ -1,0 +1,145 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PhotoBoothApp.ViewModels"
+        x:Class="PhotoBoothApp.Views.MainWindow"
+        Title="PhotoBooth"
+        Width="960" Height="800"
+        MinWidth="400" MinHeight="400"
+        Background="#1a1a2e"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel HorizontalAlignment="Stretch" Margin="16" Spacing="16">
+
+            <!-- Title -->
+            <TextBlock Text="PhotoBooth"
+                       Foreground="#e94560"
+                       FontSize="36"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center" />
+
+            <!-- Camera selector — wraps vertically on narrow windows -->
+            <WrapPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <TextBlock Text="Camera:"
+                           Foreground="#eeeeee"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           Margin="0,0,12,0" />
+                <ComboBox ItemsSource="{Binding Cameras}"
+                          SelectedItem="{Binding SelectedCamera}"
+                          MinWidth="200"
+                          MaxWidth="400"
+                          HorizontalAlignment="Stretch"
+                          FontSize="14"
+                          Background="#16213e"
+                          Foreground="#eeeeee"
+                          BorderBrush="#e94560"
+                          BorderThickness="2"
+                          CornerRadius="8"
+                          Padding="12,8">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </WrapPanel>
+
+            <!-- Preview area — fills available width, maintains aspect ratio -->
+            <Border HorizontalAlignment="Stretch"
+                    Background="Black"
+                    ClipToBounds="True"
+                    CornerRadius="12">
+                <Panel>
+                    <!-- Live camera feed — Uniform stretch keeps aspect ratio -->
+                    <Image Source="{Binding PreviewFrame}"
+                           Stretch="Uniform" />
+
+                    <!-- Countdown overlay -->
+                    <Border IsVisible="{Binding IsCountdownVisible}"
+                            Background="#66000000"
+                            CornerRadius="12">
+                        <Viewbox MaxHeight="300" Margin="20">
+                            <TextBlock Text="{Binding CountdownText}"
+                                       FontSize="200"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect Color="#e94560"
+                                                       BlurRadius="40"
+                                                       OffsetX="0"
+                                                       OffsetY="0" />
+                                </TextBlock.Effect>
+                            </TextBlock>
+                        </Viewbox>
+                    </Border>
+
+                    <!-- Flash overlay -->
+                    <Border IsVisible="{Binding IsFlashVisible}"
+                            Background="White"
+                            CornerRadius="12"
+                            Opacity="0.9" />
+                </Panel>
+            </Border>
+
+            <!-- Controls row — toggle + button side by side, wraps on narrow -->
+            <WrapPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <ToggleSwitch IsChecked="{Binding AutoPrint}"
+                              OnContent="Print dialog enabled"
+                              OffContent="Print dialog disabled"
+                              Foreground="#eeeeee"
+                              FontSize="14"
+                              Margin="8,0" />
+
+                <Button Content="Take Photo"
+                        Command="{Binding TakePhotoCommand}"
+                        IsEnabled="{Binding IsCaptureEnabled}"
+                        HorizontalAlignment="Center"
+                        Padding="36,14"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Background="#e94560"
+                        CornerRadius="25"
+                        Margin="8,0"
+                        Cursor="Hand">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#c73652" />
+                        </Style>
+                        <Style Selector="Button:disabled /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#555555" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </WrapPanel>
+
+            <!-- Status text -->
+            <TextBlock Text="{Binding StatusText}"
+                       Foreground="#888888"
+                       FontSize="14"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap"
+                       TextAlignment="Center" />
+
+            <!-- Captured photo result — stretches with window -->
+            <Border IsVisible="{Binding IsCapturedPhotoVisible}"
+                    CornerRadius="12"
+                    BorderBrush="#e94560"
+                    BorderThickness="3"
+                    HorizontalAlignment="Stretch"
+                    ClipToBounds="True">
+                <Image Source="{Binding CapturedPhoto}"
+                       Stretch="Uniform" />
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</Window>
